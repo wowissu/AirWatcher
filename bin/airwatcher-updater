@@ -1,0 +1,6 @@
+#/bin/bash
+
+GOPATH=/Users/wowissu/go-workspace
+
+cd $GOPATH/src/github.com/wowissu/AirWatcher
+$GOPATH/bin/AirWatcher --update

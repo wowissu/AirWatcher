@@ -7,12 +7,12 @@ import (
 )
 
 func main() {
-	isGetData := flag.Bool("getdata", false, "download json from https://opendata.epa.gov.tw")
+	doUpdate := flag.Bool("update", false, "download json from https://opendata.epa.gov.tw")
 	flag.Parse()
 
 	// fmt.Printf("getdata: %t\n", *getdata)
 
-	if *isGetData == true {
+	if *doUpdate == true {
 		update.Do()
 	}
 }
