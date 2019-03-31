@@ -1,27 +1,60 @@
 package update
 
-type location struct {
-	SiteName    string `json:"SiteName"`
-	County      string `json:"County"`
-	AQI         string `json:"AQI"`
-	Pollutant   string `json:"Pollutant"`
-	Status      string `json:"Status"`
-	SO2         string `json:"SO2"`
-	CO          string `json:"CO"`
-	CO8hr       string `json:"CO_8hr"`
-	O3          string `json:"O3"`
-	O38hr       string `json:"O3_8hr"`
-	PM10        string `json:"PM10"`
-	PM25        string `json:"PM2.5"`
-	NO2         string `json:"NO2"`
-	NOx         string `json:"NOx"`
-	NO          string `json:"NO"`
-	WindSpeed   string `json:"WindSpeed"`
-	WindDirec   string `json:"WindDirec"`
-	PublishTime string `json:"PublishTime"`
-	PM25AVG     string `json:"PM2.5_AVG"`
-	PM10AVG     string `json:"PM10_AVG"`
-	SO2AVG      string `json:"SO2_AVG"`
-	Longitude   string `json:"Longitude"`
-	Latitude    string `json:"Latitude"`
+import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"time"
+)
+
+type LocationUpdater struct{}
+
+func (l *LocationUpdater) Update() error {
+	// get sites.json
+	sitesStorage := []SiteStorage{}
+	siteStorageMap := make(map[string]*SiteStorage)
+
+	sitesContent, err := ioutil.ReadFile(ApiDir("sites.json"))
+	if err != nil {
+		return err
+	}
+	json.Unmarshal(sitesContent, &sitesStorage)
+
+	// gen sites name map
+	for index, ss := range sitesStorage {
+		siteStorageMap[ss.SiteName] = &sitesStorage[index]
+	}
+
+	// 今日
+	t := time.Now()
+	t = t.AddDate(0, 0, -1)
+
+	hourlyFilesDir := filepath.Dir(new(SitesDataHourly).FileName(DataDir(), t))
+	hourlyFiles := []string{}
+	err = filepath.Walk(hourlyFilesDir, func(path string, f os.FileInfo, err error) error {
+		if !f.IsDir() {
+			hourlyFiles = append(hourlyFiles, path)
+		}
+		return nil
+	})
+	check(err)
+
+	for _, f := range hourlyFiles {
+		hourSites := SitesDataHourly{}
+		hourSites.Load(f)
+
+		for _, s := range hourSites {
+			// fmt.Println(s)
+			siteStorageMap[s.SiteName].List = append(siteStorageMap[s.SiteName].List, s)
+		}
+	}
+
+	for _, s := range siteStorageMap {
+		fmt.Println(s.Dir)
+		s.Save("today.json")
+	}
+
+	return nil
 }

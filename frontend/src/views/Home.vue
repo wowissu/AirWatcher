@@ -1,18 +1,26 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <RWDContainer>
+      <SmartSwitcher></SmartSwitcher>
+    </RWDContainer>
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
+import RWDContainer from '@/components/RWDContainer'
+import SmartSwitcher from '@/components/SmartSwitcher'
 
 export default {
   name: 'home',
   components: {
-    HelloWorld
+    RWDContainer,
+    SmartSwitcher
   }
 }
 </script>
+
+<style lang="scss">
+.home {
+
+}
+</style>
